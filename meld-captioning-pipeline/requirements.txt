@@ -1,0 +1,9 @@
+transformers
+whisper
+accelerate
+timm
+torchvision
+torchaudio
+pandas
+tqdm
+opencv-python
