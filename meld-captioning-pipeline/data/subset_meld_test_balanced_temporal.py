@@ -6,11 +6,11 @@ from tqdm import tqdm
 
 # ====== Settings ======
 
-meld_root = './MELD.Raw'
+meld_root = './data/MELD.Raw'
 test_csv_path = os.path.join(meld_root, 'test_sent_emo.csv')
 output_repeated_dir = os.path.join(meld_root, 'output_repeated_splits_test')
 
-output_dir = './MELD_test_subset'
+output_dir = './data/MELD_test_subset'
 subset_video_audio_dir = os.path.join(output_dir, 'test_subset')
 subset_subtitle_dir = os.path.join(output_dir, 'test_subtitles')
 subset_audio_dir = os.path.join(output_dir, 'test_subset_wav')
