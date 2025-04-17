@@ -7,3 +7,5 @@ torchaudio
 pandas
 tqdm
 opencv-python
+cv2
+pandas
