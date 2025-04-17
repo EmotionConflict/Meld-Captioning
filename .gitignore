@@ -1,0 +1,9 @@
+# Dataset folders
+data/
+
+# Conda or virtual environments
+env/
+.venv/
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/

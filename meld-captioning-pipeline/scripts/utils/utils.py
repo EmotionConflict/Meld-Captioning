@@ -2,8 +2,6 @@
 # scripts/utils.py
 # AU intensity phrases ("strongly furrows brow"), Audio loudness phrases ("speaks very loudly"), Merged final description without emotions
 
-
-
 import cv2
 from PIL import Image
 import torch

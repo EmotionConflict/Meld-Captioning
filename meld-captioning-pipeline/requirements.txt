@@ -4,8 +4,11 @@ accelerate
 timm
 torchvision
 torchaudio
+torch
 pandas
 tqdm
 opencv-python
-cv2
-pandas
+# cv2, if with conda, run "conda install -c conda-forge opencv"
+soundfile
+scipy
+pillow
