@@ -32,7 +32,9 @@ FPS = 30
 
 # Initialize Qwen-Audio
 print("[🔄] Loading Qwen-Audio...")
-qwen_model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen-Audio", device_map="auto", trust_remote_code=True)
+# qwen_model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen-Audio", device_map="auto", trust_remote_code=True)
+device = "cuda" if torch.cuda.is_available() else "cpu"
+qwen_model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen-Audio", trust_remote_code=True).to(device)
 qwen_processor = AutoProcessor.from_pretrained("Qwen/Qwen-Audio", trust_remote_code=True)
 
 def extract_au(video_path, output_dir):
@@ -62,7 +64,8 @@ def describe_audio_qwen(audio_path):
     waveform, sr = torchaudio.load(audio_path)
     if sr != 16000:
         waveform = torchaudio.transforms.Resample(sr, 16000)(waveform)
-    inputs = qwen_processor(audios=waveform.squeeze(), sampling_rate=16000, return_tensors="pt").to(qwen_model.device)
+    # inputs = qwen_processor(audios=waveform.squeeze(), sampling_rate=16000, return_tensors="pt").to(qwen_model.device)
+    inputs = qwen_processor(audios=waveform.squeeze(), sampling_rate=16000, return_tensors="pt").to(device)
     prompt = "Describe the speaker’s emotional tone, voice intensity, speech style, and delivery. Include observations about pitch, pacing, loudness, hesitation, and clarity. Avoid guessing the speaker's intent or emotion; focus only on vocal characteristics."
     output_ids = qwen_model.generate(**inputs, prompt=prompt, max_new_tokens=100)
     return qwen_processor.batch_decode(output_ids, skip_special_tokens=True)[0]

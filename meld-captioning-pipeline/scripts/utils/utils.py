@@ -10,9 +10,15 @@ import pandas as pd
 import whisper
 from transformers import BlipProcessor, BlipForConditionalGeneration
 
+print(dir(whisper))
+
 # Load models globally
 processor = BlipProcessor.from_pretrained("Salesforce/blip-image-captioning-base")
-blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base").to("cuda")
+# blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base").to("cuda")
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+blip_model = BlipForConditionalGeneration.from_pretrained("Salesforce/blip-image-captioning-base").to(device)
+
 whisper_model = whisper.load_model("small")
 
 # AU Intensity Mapping
