@@ -1,6 +1,0 @@
-[submodule "external/Qwen-Audio"]
-	path = external/Qwen-Audio
-	url = https://github.com/QwenLM/Qwen-Audio
-[submodule "external/OpenFace"]
-	path = external/OpenFace
-	url = https://github.com/TadasBaltrusaitis/OpenFace.git
