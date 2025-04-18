@@ -1,5 +1,6 @@
 # Dataset folders
-data/
+meld-captioning-pipeline/data/MELD_test_subset/
+meld-captioning-pipeline/data/.DS_Store
 
 # Conda or virtual environments
 env/
@@ -8,4 +9,17 @@ env/
 # Jupyter notebook checkpoints
 .ipynb_checkpoints/
 
+# External modules or data
 external/
+
+# Ignore large zip
+meld-captioning-pipeline.zip
+*.zip
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+
+# OS-generated files
+.DS_Store
+Thumbs.db
