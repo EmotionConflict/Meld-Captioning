@@ -1,6 +1,6 @@
 # Dataset folders
-meld-captioning-pipeline/data/MELD_test_subset/
-meld-captioning-pipeline/data/.DS_Store
+# meld-captioning-pipeline/data/MELD_test_subset/
+# meld-captioning-pipeline/data/.DS_Store
 
 # Conda or virtual environments
 env/
