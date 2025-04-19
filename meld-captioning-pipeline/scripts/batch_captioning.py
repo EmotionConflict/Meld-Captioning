@@ -66,7 +66,7 @@ def describe_audio_qwen(audio_path):
         waveform = torchaudio.transforms.Resample(sr, 16000)(waveform)
     # inputs = qwen_processor(audios=waveform.squeeze(), sampling_rate=16000, return_tensors="pt").to(qwen_model.device)
     inputs = qwen_processor(audios=waveform.squeeze(), sampling_rate=16000, return_tensors="pt").to(device)
-    prompt = "Describe the speaker’s emotional tone, voice intensity, speech style, and delivery. Include observations about pitch, pacing, loudness, hesitation, and clarity. Avoid guessing the speaker's intent or emotion; focus only on vocal characteristics."
+    prompt = cod
     output_ids = qwen_model.generate(**inputs, prompt=prompt, max_new_tokens=100)
     return qwen_processor.batch_decode(output_ids, skip_special_tokens=True)[0]
 
