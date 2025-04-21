@@ -1,5 +1,4 @@
 transformers
-whisper
 accelerate
 timm
 torchvision
@@ -13,3 +12,8 @@ soundfile
 scipy
 pillow
 numpy<2.0
+# below are for whisper
+transformers_stream_generator
+tiktoken
+jiwer
+git+https://github.com/openai/whisper.git
