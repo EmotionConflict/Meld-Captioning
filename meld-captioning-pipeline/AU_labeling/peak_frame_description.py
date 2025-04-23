@@ -22,7 +22,7 @@ def find_peak_frame(au_data_path):
 
     # Step 3: Find emotional peak frame
     peak_frame_index = df["emotion_sum"].idxmax()
-    return peak_frame_index
+    return peak_frame_index, peak_frame_index/30
 
 # --- Step 1: Extract specific frame ---
 def extract_frame_by_index(video_path, frame_idx):
@@ -38,27 +38,27 @@ def extract_frame_by_index(video_path, frame_idx):
     return Image.fromarray(frame_rgb)
 
 # --- Step 2: Load BLIP-2 model ---
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-processor = Blip2Processor.from_pretrained("Salesforce/blip2-flan-t5-xl")
-model = Blip2ForConditionalGeneration.from_pretrained(
-    "Salesforce/blip2-flan-t5-xl",
-    torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-).to(device)
+# device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# processor = Blip2Processor.from_pretrained("Salesforce/blip2-flan-t5-xl")
+# model = Blip2ForConditionalGeneration.from_pretrained(
+#     "Salesforce/blip2-flan-t5-xl",
+#     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
+# ).to(device)
 
 
-# --- Config ---
-video_path = "./data/MELD_test_subset/test_subset/dia1_utt1.mp4"
-csv_path = "./AU_labeling/output/dia1_utt1.csv"
-frame_index = find_peak_frame(csv_path)  # Just put the exact frame number you want
+# # --- Config ---
+# video_path = "./data/MELD_test_subset/test_subset/dia29_utt7.mp4"
+# csv_path = "./AU_labeling/AU_data/dia29_utt7.csv"
+# frame_index, time = find_peak_frame(csv_path)  # Just put the exact frame number you want
 # print(frame_index)
-prompt = "Describe what's in this frame."
+# prompt = "Describe what's in this frame."
 
 
 
-# --- Step 3: Generate output ---
-image = extract_frame_by_index(video_path, frame_index)
-inputs = processor(images=image, text=prompt, return_tensors="pt").to(device, torch.float16 if torch.cuda.is_available() else torch.float32)
-generated_ids = model.generate(**inputs)
-generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
+# # --- Step 3: Generate output ---
+# image = extract_frame_by_index(video_path, frame_index)
+# inputs = processor(images=image, text=prompt, return_tensors="pt").to(device, torch.float16 if torch.cuda.is_available() else torch.float32)
+# generated_ids = model.generate(**inputs)
+# generated_text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0]
 
-print("Frame Description:", generated_text)
+# print("Frame Description:", generated_text)

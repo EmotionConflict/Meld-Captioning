@@ -72,7 +72,7 @@ def find_peak_frame(au_data_path):
 
     # Step 3: Find emotional peak frame
     peak_frame_index = df["emotion_sum"].idxmax()
-    return peak_frame_index
+    return peak_frame_index, peak_frame_index/30
 
 
 def parse_au_intensity(openface_csv_path, peak_index):
@@ -83,7 +83,7 @@ def parse_au_intensity(openface_csv_path, peak_index):
         row = df.iloc[peak_index]
 
         au_phrases = []
-        peak_aus = []
+        peak_aus = {}
 
         for au in AU_PHRASES.keys():
             if f"{au}_r" in row:
@@ -93,15 +93,15 @@ def parse_au_intensity(openface_csv_path, peak_index):
                     phrase = AU_PHRASES[au]
                     full_phrase = f"{intensity} {phrase}"
                     au_phrases.append(full_phrase)
-                    peak_aus.append(au)
+                peak_aus[au]=value
 
         return au_phrases, peak_aus
     except Exception as e:
         print(f"[ERROR] AU parsing failed for {openface_csv_path}: {e}")
         return [], []
 
-if __name__ == "__main__":
-    os.makedirs("AU_labeling/output", exist_ok=True)
-    extract_au_from_video("/Users/patrickliu/Documents/GitHub/Meld-Captioning/meld-captioning-pipeline/data/MELD_test_subset/test_subset/dia1_utt2.mp4", "AU_labeling/output", "/Users/patrickliu/Documents/GitHub/OpenFace/build/bin/FeatureExtraction")
-    idx= find_peak_frame("AU_labeling/output/dia1_utt2.csv")
-    print(parse_au_intensity("AU_labeling/output/dia1_utt2.csv", idx))
+# if __name__ == "__main__":
+#     os.makedirs("AU_labeling/output", exist_ok=True)
+#     extract_au_from_video("/Users/patrickliu/Documents/GitHub/Meld-Captioning/meld-captioning-pipeline/data/MELD_test_subset/test_subset/dia1_utt3.mp4", "AU_labeling/output", "/Users/patrickliu/Documents/GitHub/OpenFace/build/bin/FeatureExtraction")
+#     idx= find_peak_frame("AU_labeling/output/dia1_utt3.csv")
+#     print(parse_au_intensity("AU_labeling/output/dia1_utt3.csv", idx))

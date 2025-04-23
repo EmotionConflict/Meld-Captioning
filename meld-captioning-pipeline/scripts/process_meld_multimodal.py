@@ -99,13 +99,13 @@ def process_video(video_path, qwen_model, qwen_processor, whisper_model):
     with open(json_path, "w") as f:
         json.dump(result, f, indent=2)
 
-if __name__ == "__main__":
-    os.makedirs(OUTPUT_FOLDER, exist_ok=True)
-    qwen_model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen-Audio", device_map="auto", trust_remote_code=True)
-    qwen_processor = AutoProcessor.from_pretrained("Qwen/Qwen-Audio", trust_remote_code=True)
-    whisper_model = whisper.load_model(WHISPER_MODEL_NAME)
-    for video_file in glob(os.path.join(INPUT_FOLDER, "*.mp4")):
-        try:
-            process_video(video_file, qwen_model, qwen_processor, whisper_model)
-        except Exception as e:
-            print(f"[ERROR] {video_file}: {e}")
+# if __name__ == "__main__":
+#     os.makedirs(OUTPUT_FOLDER, exist_ok=True)
+#     qwen_model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen-Audio", device_map="auto", trust_remote_code=True)
+#     qwen_processor = AutoProcessor.from_pretrained("Qwen/Qwen-Audio", trust_remote_code=True)
+#     whisper_model = whisper.load_model(WHISPER_MODEL_NAME)
+#     for video_file in glob(os.path.join(INPUT_FOLDER, "*.mp4")):
+#         try:
+#             process_video(video_file, qwen_model, qwen_processor, whisper_model)
+#         except Exception as e:
+#             print(f"[ERROR] {video_file}: {e}")
