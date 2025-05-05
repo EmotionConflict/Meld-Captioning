@@ -15,7 +15,7 @@ subset_video_audio_dir = os.path.join(output_dir, 'test_subset')
 subset_subtitle_dir = os.path.join(output_dir, 'test_subtitles')
 subset_audio_dir = os.path.join(output_dir, 'test_subset_wav')
 
-samples_per_emotion = 50
+samples_per_emotion = 10
 temporal_window = 1
 
 # ====== Create Output Folders ======
