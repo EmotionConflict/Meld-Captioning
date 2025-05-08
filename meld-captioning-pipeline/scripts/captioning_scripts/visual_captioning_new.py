@@ -1,16 +1,35 @@
-from AU_labeling.au_extraction import map_au_intensity, extract_au_from_video, parse_au_intensity
-from AU_labeling.peak_frame_description import find_peak_frame, extract_frame_by_index
-from scripts.process_meld_multimodal import describe_audio_qwen
-
+import sys
 import os
 import io
+import json
+import traceback
 import cv2
 from PIL import Image
 import torch
-from transformers import Blip2Processor, Blip2ForConditionalGeneration, AutoProcessor, AutoModelForCausalLM, AutoTokenizer, pipeline
 import pandas as pd
-import json
-import torchaudio
+# import torchaudio
+# from transformers import Blip2Processor, Blip2ForConditionalGeneration, AutoProcessor, AutoModelForCausalLM, AutoTokenizer, pipeline
+import base64
+
+# === Path Setup ===
+# Add parent directory to sys.path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+
+from AU_labeling.au_extraction_new import map_au_intensity, extract_au_from_video, parse_au_intensity
+from AU_labeling.peak_frame_description_new import find_peak_frame, extract_frame_by_index
+from process_meld_multimodal import describe_audio_qwen
+
+# === Output Path ===
+output_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/MELD_test_subset/MELD_annotations.json"))
+os.makedirs(os.path.dirname(output_path), exist_ok=True)
+
+# === OpenAI GPT-4o client ===
+from openai import OpenAI
+client = OpenAI(api_key="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") #API-KEY
+#wrongclient = OpenAI(api_key="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")
+
+
+# client = OpenAI(api_key="API-KEY") 
 
 # device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 # blip_processor = Blip2Processor.from_pretrained("Salesforce/blip2-flan-t5-xl")
@@ -19,9 +38,6 @@ import torchaudio
 #     torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
 # ).to(device)
 
-from openai import OpenAI
-import base64
-client = OpenAI(api_key="API-KEY")
 # qwen_model = AutoModelForCausalLM.from_pretrained("Qwen/Qwen-Audio", trust_remote_code=True).to(device)
 # qwen_processor = AutoProcessor.from_pretrained("Qwen/Qwen-Audio", trust_remote_code=True)
 
@@ -33,7 +49,7 @@ client = OpenAI(api_key="API-KEY")
 # # Create pipeline
 # llama = pipeline("text-generation", model=llama_model, tokenizer=tokenizer)
 
-# AU to facial phrase mapping
+# === AU to Facial Phrase Mapping ===
 AU_PHRASES = {
     'AU01': 'Inner Brow Raiser',
     'AU02': 'Outer Brow Raiser',
@@ -55,23 +71,36 @@ AU_PHRASES = {
     'AU45': 'Blink'
 }
 
-directory_path = "data/MELD_test_subset/test_subset"
+# === Input Video Directory ===
+directory_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../data/MELD_test_subset/test_subset"))
+if not os.path.exists(directory_path):
+    print(f"[❌] Directory does not exist: {directory_path}")
+else:
+    print(f"[✅] Directory exists. Continuing...")
 
-print(os.path.abspath(directory_path))
-
+# === Main Processing Loop ===
 total=0
 for root, dirs, files in os.walk(directory_path):
     for file in files:
+        # print(f"[▶] Processing file: {file}")
         file_path = os.path.join(root, file)
         # print(f"Found file: {file_path}")
-
         video_id= file
 
+        # === AU Extraction ===
         os.makedirs("AU_labeling/AU_data", exist_ok=True)
-        extract_au_from_video(file_path, "AU_labeling/AU_data", "/Users/patrickliu/Documents/GitHub/OpenFace/build/bin/FeatureExtraction")
+        # extract_au_from_video(file_path, "AU_labeling/AU_data", "../OpenFace/build/bin/FeatureExtraction")
+        openface_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../OpenFace/build/bin/FeatureExtraction"))
+
+        # print(f"[INFO] Extracting AU for: {video_id}")
+        extract_au_from_video(file_path, "AU_labeling/AU_data", openface_path)
+
+        # print("[DEBUG] AU extraction done")
+
         peak_frame, time= find_peak_frame(f"AU_labeling/AU_data/{file[:-3]}csv")
         au_phrases, raw_aus = parse_au_intensity(f"AU_labeling/AU_data/{file[:-3]}csv", peak_frame)
 
+        # === Visual Frame Description ===
         # print("started image description")
         prompt = "Describe the setting and what the people in the frame are doing."
         image = extract_frame_by_index(file_path, peak_frame)
@@ -79,14 +108,14 @@ for root, dirs, files in os.walk(directory_path):
         image.save(buffer, format="JPEG")  # or "PNG"
         base64_img = base64.b64encode(buffer.getvalue()).decode("utf-8")
 
-
+        prompt = "Describe what is happening in this video frame as if you're narrating it to someone who cannot see it. Focus only on visible details such as people’s actions, facial expressions, gestures, body language, clothing, objects, and the physical setting. Be specific about how people are positioned and how they interact with each other and their surroundings. Write descriptively—do not simply list objects. Include visual cues that might suggest emotional states, but don’t speculate beyond what’s visible."
         response = client.chat.completions.create(
-            model="gpt-4o-mini",  # ✅ Must be vision-capable
+            model="gpt-4o-mini",  # Must be vision-capable
             messages=[
                 {
                     "role": "user",
                     "content": [
-                        {"type": "text", "text": "Describe what is happening in this video frame as if you're narrating it to someone who cannot see it. Focus only on visible details such as people’s actions, facial expressions, gestures, body language, clothing, objects, and the physical setting. Be specific about how people are positioned and how they interact with each other and their surroundings. Write descriptively—do not simply list objects. Include visual cues that might suggest emotional states, but don’t speculate beyond what’s visible."},
+                        {"type": "text", "text": prompt},
                         {
                             "type": "image_url",
                             "image_url": {
@@ -117,7 +146,8 @@ for root, dirs, files in os.walk(directory_path):
         # print(audio_description)
 
         subtitle=""
-        with open(f"data/MELD_test_subset/test_subtitles/{file[:-3]}txt", "r") as f:
+        subtitle_path = os.path.abspath(os.path.join(os.path.dirname(__file__), f"../../data/MELD_test_subset/test_subtitles/{file[:-3]}txt"))
+        with open(subtitle_path, "r") as f: #f"../data/MELD_test_subset/test_subtitles/{file[:-3]}txt"
             subtitle = f.read()
 
         coarse_summary=f"{visual_caption} The facial expressions include {', '.join(au_phrases)}. Saying: '{subtitle}'."
@@ -134,29 +164,37 @@ for root, dirs, files in os.walk(directory_path):
 
         result = {
             "video_id": video_id,
-            "peak_time": time,
             # "AU_raw_intensities": au_intensities,
             "visual_expression_description": au_phrases,
             "visual_objective_description": visual_caption,
+            "peak_time": time,
             "raw_AU_values_at_peak": raw_aus,
             "coarse-grained_summary": coarse_summary,
             # "fine-grained_summary": fine_summary,
         }
 
         # print(result)
-        os.makedirs("data/MELD_test_subset", exist_ok=True)
+        os.makedirs("../data/MELD_test_subset", exist_ok=True)
         try:
-            with open(f"data/MELD_test_subset/annotations_2.json", "r") as f:
+            with open(f"../data/MELD_test_subset/MELD_annotations.json", "r") as f:
                 data = json.load(f)
         except FileNotFoundError:
             data = []
 
-        data.append(result)
+        # === Append to JSON Output ===
+        if os.path.exists(output_path):
+            with open(output_path, "r") as f:
+                data = json.load(f)
+        else:
+            data = [] #new block
 
-        with open(f"data/MELD_test_subset/annotations_2.json", "w") as f:
+        data.append(result)
+        # print(data)
+
+        # with open(f"../data/MELD_test_subset/MELD_annotations.json", "w") as f:
+        with open(output_path, "w") as f:
             json.dump(data, f, indent=2)
-        # print(f"[✔] Saved")
+        print(f"[✔] Saved to: ../data/MELD_test_subset/MELD_annotations.json")
         total+=1
         print(total)
-
         # break

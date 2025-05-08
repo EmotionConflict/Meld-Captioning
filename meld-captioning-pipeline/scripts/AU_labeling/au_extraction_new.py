@@ -100,8 +100,14 @@ def parse_au_intensity(openface_csv_path, peak_index):
         print(f"[ERROR] AU parsing failed for {openface_csv_path}: {e}")
         return [], []
 
-if __name__ == "__main__":
-    os.makedirs("../../outputs/AU_labeling", exist_ok=True)
-    extract_au_from_video("../../data/MELD_test_subset/test_subset/dia12_utt12.mp4", "../../outputs/AU_labeling", "../../OpenFace/build/bin/FeatureExtraction")
-    idx= find_peak_frame("../../outputs/AU_labeling/dia12_utt12.csv")
-    print(parse_au_intensity("../../outputs/AU_labeling/dia12_utt12.csv", idx))
+# if __name__ == "__main__":
+#     os.makedirs("../../outputs/AU_labeling", exist_ok=True)
+#     extract_au_from_video("../../data/MELD_test_subset/test_subset/dia12_utt12.mp4", "../../outputs/AU_labeling", "../../OpenFace/build/bin/FeatureExtraction")
+#     idx= find_peak_frame("../../outputs/AU_labeling/dia12_utt12.csv")
+#     print(parse_au_intensity("../../outputs/AU_labeling/dia12_utt12.csv", idx))
+
+# if __name__ == "__main__":
+#     os.makedirs("AU_data", exist_ok=True)
+#     extract_au_from_video("../../data/MELD_test_subset/test_subset/dia12_utt12.mp4", "AU_data", "../../OpenFace/build/bin/FeatureExtraction")
+#     idx= find_peak_frame("AU_data/dia12_utt12.csv")
+#     print(parse_au_intensity("AU_data/dia12_utt12.csv", idx))
