@@ -1,0 +1,10 @@
+Input:../../data/MELD_test_subset/test_subset/dia12_utt12.mp4
+Input full path:/Users/michellekim/Documents/GitHub/Meld-Captioning/meld-captioning-pipeline/data/MELD_test_subset/test_subset/dia12_utt12.mp4
+Camera parameters:875,875,640,360
+Output csv:dia12_utt12.csv
+Gaze: 0
+AUs: 1
+Landmarks 2D: 0
+Landmarks 3D: 0
+Pose: 0
+Shape parameters: 0
